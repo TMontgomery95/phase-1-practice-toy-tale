@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // You will be writing the code to wire up the "Create Toy" button.
-// needs h2, img src, p, and button.like-btn
 let data = fetch('http://localhost:3000/toys')
   .then((response) => response.json())
   .then((data) => createCard(data));
@@ -73,14 +72,8 @@ let data = fetch('http://localhost:3000/toys')
 // console.log(toys);
   toys.forEach(createCard);
   
-  // let toy = 0;
-  // function myFunction(toy, [], toys) {
-  //   toys[0] = 
-  // }
-
-
+// needs img src, p, and button.like-btn
 function createCard (data) {
-  // toys[0] =
   console.log(createCard) 
   const createDiv = document.createElement('div');
     createDiv.className = 'card';
@@ -88,4 +81,7 @@ function createCard (data) {
     createDiv.appendChild(createH2);
   const toyCollection = document.getElementById('toy-collection');
     toyCollection.appendChild(createDiv);
+  let createImage = document.createElement('img');
+    
+    createDiv.appendChild(createImage);
 }
