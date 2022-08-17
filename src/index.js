@@ -3,6 +3,79 @@ let addToy = false;
 document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.querySelector("#new-toy-btn");
   const toyFormContainer = document.querySelector(".container");
+  const toyCollection = document.querySelector('#toy-collection');
+
+
+  fetch('http://localhost:3000/toys')
+    .then (res => res.json())
+    .then(toys => {
+      let toysHTML = toys.map(function(toy) {
+        return `
+        <div class="card">
+        <h2>${toy.name}</h2>
+        <img src=${toy.image} class="toy-avatar" />
+        <p>${toy.likes} Likes</p>
+        <button class="like-btn" id="${toy.id}">Like ❤️</button>
+        </div>
+        `
+      })
+      toyCollection.innerHTML += toysHTML.join(' ');
+    })
+
+  toyFormContainer.addEventListener('submit', function(e) {
+    e.preventDefault();
+    // console.log(e.target.name);
+    const toyName = e.target.name.value;
+    const toyImage = e.target.image.value;
+    // console.log(toyName, toyImage);
+    fetch('http://localhost:3000/toys', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        name: toyName,
+        image: toyImage,
+        likes: 0
+      })
+    })
+    .then(res => res.json())
+    .then(newToy => {
+      newToyHTML = `
+      <div class="card">
+        <h2>${newToy.name}</h2>
+        <img src=${newToy.image} class="toy-avatar" />
+        <p>${newToy.likes} Likes</p>
+        <button class="like-btn" id="${newToy.id}">Like ❤️</button>
+        </div>
+      `
+      toyCollection.innerHTML += newToyHTML;
+      e.target.reset;
+    });
+    
+  })
+
+  // Like functionality
+  toyCollection.addEventListener('click', (e) => {
+    if (e.target.className === 'like-btn') {
+      let currentLikes = parseInt(e.target.previousElementSibling.innerText);
+      let newLikes = currentLikes + 1;
+      e.target.previousElementSibling.innerText = newLikes + ' likes';
+      fetch(`http://localhost:3000/toys/${e.target.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          likes: newLikes
+        })
+      })
+    }
+  })
+
+
   addBtn.addEventListener("click", () => {
     // hide & seek with the form
     addToy = !addToy;
@@ -13,75 +86,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
-// You will be writing the code to wire up the "Create Toy" button.
-let data = fetch('http://localhost:3000/toys')
-  .then((response) => response.json())
-  .then((data) => createCard(data));
-
-  const toys = [
-    {
-      "id": 1,
-      "name": "Woody",
-      "image": "http://www.pngmart.com/files/3/Toy-Story-Woody-PNG-Photos.png",
-      "likes": 5
-    },
-    {
-      "id": 2,
-      "name": "Buzz Lightyear",
-      "image": "http://www.pngmart.com/files/6/Buzz-Lightyear-PNG-Transparent-Picture.png",
-      "likes": 8
-    },
-    {
-      "id": 3,
-      "name": "Mr. Potato Head",
-      "image": "https://vignette.wikia.nocookie.net/universe-of-smash-bros-lawl/images/d/d8/Mr-potato-head-toy-story.gif/revision/latest?cb=20151129131217",
-      "likes": 3
-    },
-    {
-      "id": 4,
-      "name": "Slinky Dog",
-      "image": "https://www.freeiconspng.com/uploads/slinky-png-transparent-1.png",
-      "likes": 4
-    },
-    {
-      "id": 5,
-      "name": "Rex",
-      "image": "https://static.wikia.nocookie.net/disney/images/5/56/Profile_-_Rex.jpeg/revision/latest?cb=20190313050619",
-      "likes": 1
-    },
-    {
-      "id": 6,
-      "name": "Bo Peep",
-      "image": "http://4.bp.blogspot.com/_OZHbJ8c71OM/Sog43CMFX2I/AAAAAAAADEs/0AKX0XslD4g/s400/bo.png",
-      "likes": 2
-    },
-    {
-      "id": 7,
-      "name": "Hamm",
-      "image": "https://cdn140.picsart.com/244090226021212.png?r1024x1024",
-      "likes": 0
-    },
-    {
-      "id": 8,
-      "name": "Little Green Men",
-      "image": "http://www.pngmart.com/files/3/Toy-Story-Alien-PNG-File.png",
-      "likes": 1
-    }
-  ];
-// console.log(toys);
-  toys.forEach(createCard);
-  
-// needs img src, p, and button.like-btn
-function createCard (data) {
-  console.log(createCard) 
-  const createDiv = document.createElement('div');
-    createDiv.className = 'card';
-  const createH2 = document.createElement('h2');
-    createDiv.appendChild(createH2);
-  const toyCollection = document.getElementById('toy-collection');
-    toyCollection.appendChild(createDiv);
-  let createImage = document.createElement('img');
-    
-    createDiv.appendChild(createImage);
-}
